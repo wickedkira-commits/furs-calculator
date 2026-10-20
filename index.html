@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Калькулятор себестоимости изделий</title>
+<style>
+:root{--bg:#FDF6E3;--card:#FFFBEF;--c:#3E2723;--a:#5D4037;--m:#8D6E63;--l:#E8DCC4;--ok:#2E7D32;--bad:#C62828}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--c);font:17px/1.5 system-ui,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:1220px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:30px;margin:8px 0 16px}
+h2{font-size:20px;margin:0 0 16px}
+h3{font-size:15px;margin:18px 0 8px;color:var(--a);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{font:inherit;font-weight:600;border:2px solid var(--c);background:transparent;color:var(--c);border-radius:12px;padding:9px 18px;cursor:pointer}
+.tab.active{background:var(--c);color:var(--bg)}
+.tab:hover{background:var(--c);color:var(--bg)}
+.card{background:var(--card);border:1px solid var(--l);border-radius:14px;box-shadow:0 2px 10px rgba(62,39,35,.08);padding:20px;margin-bottom:18px}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{display:block;font-weight:600;margin-bottom:6px;font-size:15px}
+select,input{font:inherit;color:var(--c);background:#fff;border:1.5px solid var(--m);border-radius:10px;padding:9px 12px;width:100%}
+select:focus,input:focus{outline:2px solid var(--a);outline-offset:1px}
+input[readonly]{background:#F5EFE0;cursor:default;color:var(--a)}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:9px 0;border-bottom:1px solid var(--l);font-size:15px}
+.row .nm{flex:1 1 170px;font-weight:500;min-width:0;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.row .nm .mod{font-size:11px;background:var(--l);color:var(--a);border-radius:5px;padding:1px 5px;cursor:help;font-weight:600}
+.row .nm select.linkSelect{display:inline-block;width:auto;max-width:100%;font-size:14px;font-weight:500;padding:4px 8px;background:var(--bg);border-width:1px;flex:0 1 auto}
+.row input{width:78px;padding:6px 8px;text-align:right;font-size:14px}
+.row input.pr{width:104px}
+.row input.wide{width:120px}
+.row .u{color:var(--m);font-size:13px}
+.row .x{color:var(--m);margin:0 2px}
+.row .sum{font-weight:600;text-align:right;min-width:92px;margin-left:auto;font-size:15px}
+.row .del{width:26px;height:26px;padding:0;line-height:1;border-radius:50%;font-size:15px;border:1.5px solid var(--bad);color:var(--bad);display:flex;align-items:center;justify-content:center;margin-left:6px;flex:0 0 auto}
+.row .del:hover{background:var(--bad);color:#fff}
+.sub{display:flex;justify-content:space-between;padding:11px 0;font-weight:700;font-size:17px;border-top:1px solid var(--l);margin-top:4px}
+.line{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--l)}
+.line input{width:160px;text-align:right;padding:7px 10px}
+.big{font-size:21px;font-weight:700}
+.muted{color:var(--m);font-size:15px}
+.hint{color:var(--m);font-size:13px;margin:2px 0 14px;font-weight:400}
+.line.retail{border-bottom:none;padding-top:14px;margin-top:6px;border-top:1px solid var(--l)}
+.line.retail span:first-child{font-weight:700;font-size:16px}
+.line input#rt{width:190px;font-weight:800;font-size:19px;padding:10px 12px;border-width:2px;transition:background .15s,border-color .15s,color .15s}
+.line input#rt.good{border-color:var(--ok);background:#E8F5E9;color:#1B5E20}
+.line input#rt.bad{border-color:var(--bad);background:#FFEBEE;color:#B71C1C}
+.profit{background:var(--c);color:var(--bg);border-radius:16px;padding:24px;margin-top:18px;box-shadow:0 4px 16px rgba(62,39,35,.25)}
+.profit .t{font-size:15px;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.profit .v{font-size:42px;font-weight:800;line-height:1.15;margin:6px 0}
+.profit .p{font-size:19px}
+.btns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+button{font:inherit;font-weight:600;border:2px solid var(--c);background:transparent;color:var(--c);border-radius:12px;padding:9px 16px;cursor:pointer}
+button:hover{background:var(--c);color:var(--bg)}
+.addRow{margin-left:10px;font-size:12px;padding:3px 10px;border-width:1.5px;border-radius:20px;text-transform:none;letter-spacing:0;font-weight:600}
+.iconBtn{padding:7px 11px;font-size:15px;line-height:1}
+#saved{color:var(--m);font-size:14px}
+details summary{cursor:pointer;font-weight:700;font-size:18px}
+details p{margin:6px 0;font-size:15px}
+.b-list{display:flex;flex-direction:column;gap:2px}
+.b-list .row{gap:8px}
+.b-list .row .nm{flex:1 1 200px}
+.b-list .row input[type=number]{width:110px;flex:0 0 auto}
+.sync-status{font-weight:600;font-size:14px;padding:4px 10px;border-radius:8px;background:var(--l);color:var(--a)}
+.sync-status.ok{background:#E8F5E9;color:#1B5E20}
+.sync-status.err{background:#FFEBEE;color:#B71C1C}
+.sync-status.work{background:#FFF3E0;color:#E65100}
+.sync-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--l)}
+.sync-row .lbl{flex:1 1 220px;font-weight:500;font-size:15px}
+.sync-row input{flex:0 1 340px;min-width:200px}
+.modalOverlay{position:fixed;inset:0;background:rgba(62,39,35,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modalBox{background:var(--card);border-radius:14px;padding:22px;max-width:440px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25);border:1px solid var(--l)}
+.modalTitle{font-weight:700;font-size:17px;margin-bottom:14px;color:var(--c)}
+.modalBox select{width:100%;margin-bottom:14px}
+.modalBtns{display:flex;gap:8px;justify-content:flex-end}
+@media(max-width:900px){.grid,.pick{grid-template-columns:1fr}h1{font-size:24px}.profit .v{font-size:30px}.row .nm{flex-basis:100%}.sync-row input{flex-basis:100%}}
+</style></head><body><div class="wrap">
+<h1>Калькулятор себестоимости изделий</h1>
+
+<div class="tabs">
+  <button class="tab active" data-tab="calc">Калькулятор изделий</button>
+  <button class="tab" data-tab="base">Накладные расходы и материалы</button>
+</div>
+
+<div id="tab-calc">
+<div class="card pick">
+  <div><label for="ps">Изделие</label><select id="ps"></select></div>
+  <div>
+    <label for="vs">Вариант исполнения</label>
+    <div style="display:flex;gap:6px">
+      <select id="vs" style="flex:1"></select>
+      <button id="renameVarBtn" class="iconBtn" title="Переименовать текущий вариант">✎</button>
+      <button id="delVarBtn" class="iconBtn" title="Удалить текущий вариант">✕</button>
+    </div>
+  </div>
+  <div style="grid-column:1/-1" class="btns">
+    <button id="addProd">+ Добавить изделие</button>
+    <button id="delProd">Удалить изделие</button>
+    <button id="addVarBtn">+ Добавить вариант</button>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>Структура стоимости</h2>
+    <h3>Материалы <button class="addRow" id="addMat">+ строка</button></h3>
+    <div id="mat"></div>
+    <div class="sub"><span>Итого материалы</span><span id="tm">—</span></div>
+    <h3>Работа и накладные <button class="addRow" id="addOh">+ накладные</button> <button class="addRow" id="addLb">+ оплата труда</button></h3>
+    <div id="wrk"></div>
+    <div class="sub"><span>Накладные расходы</span><span id="to">—</span></div>
+    <div class="sub"><span>Оплата труда</span><span id="tl">—</span></div>
+  </div>
+  <div class="card">
+    <h2>Итоги</h2>
+    <div class="line"><span>Себестоимость без труда</span><span id="s1">—</span></div>
+    <div class="line"><span>Себестоимость полная</span><span id="s2" class="big">—</span></div>
+    <div class="line"><span>Желаемая прибыль, % <span id="km"></span></span><input id="profit" type="number" step="1" inputmode="decimal"></div>
+    <div class="line"><span>Налог, % <span id="txm"></span></span><input id="tax" type="number" step="0.1" inputmode="decimal"></div>
+    <div class="line"><span>Рекомендуемая цена <span class="muted">(расчёт калькулятора)</span></span><span id="rec" class="big">—</span></div>
+    <div class="line retail"><span>Действующая розничная цена</span><input id="rt" type="text"></div>
+    <div class="line"><span>Сумма налога <span id="txl" class="muted"></span></span><span id="tx">—</span></div>
+    <div class="profit">
+      <div class="t">Чистая прибыль от действующей цены</div>
+      <div class="v" id="np">—</div>
+      <div class="p">Рентабельность: <b id="rp">—</b></div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Облачная синхронизация</h2>
+  <div class="hint">Синхронизирует данные между устройствами через Firebase. Введите одинаковые адрес базы и код синхронизации на всех устройствах.</div>
+  <div class="sync-row"><span class="lbl">Адрес базы данных Firebase</span><input id="syncUrl" type="text" placeholder="https://xxxxx-default-rtdb.firebaseio.com"></div>
+  <div class="sync-row"><span class="lbl">Код синхронизации (одинаковый на всех устройствах)</span><input id="syncKey" type="text" placeholder="например: masha-amber-2025-secret-842"></div>
+  <div class="btns" style="margin-top:12px">
+    <button id="syncConnectBtn">Подключить</button>
+    <button id="syncPullBtn">Скачать с сервера</button>
+    <button id="syncPushBtn">Загрузить на сервер</button>
+    <button id="syncDisconnectBtn">Отключить</button>
+    <span class="sync-status" id="syncStatus">Не подключено</span>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Управление данными</h2>
+  <div class="hint">Экспорт сохраняет все ваши цены, изделия и настройки в один файл. Импорт восстанавливает их из такого файла — удобно для резервной копии.</div>
+  <div class="btns">
+    <button id="exportBtn">⬇ Экспорт данных</button>
+    <button id="importBtn">⬆ Импорт данных</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    <button id="r1">Сбросить изделие</button>
+    <button id="r2">Сбросить всё</button>
+    <span id="saved"></span>
+  </div>
+</div>
+
+<details class="card"><summary>Как это работает</summary>
+<p><b>Рекомендуемая цена</b> = Себестоимость полная / (1 - Налог% - Желаемая прибыль%).</p>
+<p><b>Действующая розничная цена</b> — по которой вы реально продаёте. Поле зелёное, если цена не ниже рекомендуемой, и красное, если ниже.</p>
+<p><b>Налог и Желаемая прибыль</b> — задаются индивидуально для каждого варианта исполнения.</p>
+<p>В строках янтаря и дерева можно выбрать материал из выпадающего списка. Пункт «— Другое —» позволяет ввести новый материал вручную. Кнопки ✎ и ✕ рядом с вариантом позволяют переименовать или удалить текущий вариант.</p>
+<p><b>Облачная синхронизация</b> — через бесплатный сервис Firebase.</p>
+</details>
+</div>
+
+<div id="tab-base" style="display:none">
+  <div class="card">
+    <h2>Базовые цены материалов</h2>
+    <div class="hint">Изменения здесь автоматически пересчитывают цены в калькуляторе изделий.</div>
+
+    <h3>Древесина <button class="addRow" id="b-addWood">+ порода</button></h3>
+    <div class="hint">Итоговая цена породы = стоимость сырья + стабилизация полимером.</div>
+    <div id="b-woodList" class="b-list"></div>
+
+    <h3>Полимер для стабилизации</h3>
+    <div class="row"><span class="nm">Цена бутылки</span><input class="wide" id="b-polymerBottlePrice" type="number" step="1"><span class="u">₽</span></div>
+    <div class="row"><span class="nm">Объём бутылки</span><input class="wide" id="b-polymerBottleVolume" type="number" step="0.01"><span class="u">л</span></div>
+    <div class="sub"><span>Цена полимера за литр</span><span id="b-polymerPricePerLiter">—</span></div>
+    <div class="row"><span class="nm">Расход полимера на 1 см³ дерева</span><input class="wide" id="b-polymerMlPerCm3" type="number" step="0.001"><span class="u">мл/см³</span></div>
+    <div class="sub"><span>Полимер на 1 см³ дерева</span><span id="b-polymerPerCm3">—</span></div>
+
+    <h3>Янтарь <button class="addRow" id="b-addAmber">+ сорт</button></h3>
+    <div class="hint">Цена вводится в ₽/кг, калькулятор переводит в ₽/г.</div>
+    <div id="b-amberList" class="b-list"></div>
+
+    <h3>Нейзильбер</h3>
+    <div class="row"><span class="nm">Цена листа</span><input class="wide" id="b-nsSheetPrice" type="number" step="1"><span class="u">₽</span></div>
+    <div class="row"><span class="nm">Ширина листа</span><input class="wide" id="b-nsSheetWidth" type="number" step="0.1"><span class="u">см</span></div>
+    <div class="row"><span class="nm">Длина листа</span><input class="wide" id="b-nsSheetLength" type="number" step="0.1"><span class="u">см</span></div>
+    <div class="sub"><span>Площадь листа</span><span id="b-nsSheetArea">—</span></div>
+    <div class="sub"><span>Нейзильбер, ₽/см²</span><span id="b-nsPerCm2">—</span></div>
+
+    <h3>Пользовательские материалы <button class="addRow" id="b-addCustom">+ материал</button></h3>
+    <div class="hint">Материал с таким же названием и единицей автоматически подтягивается при добавлении строки в калькуляторе изделий.</div>
+    <div id="b-customList"></div>
+  </div>
+
+  <div class="card">
+    <h2>Накладные расходы в месяц</h2>
+    <div class="hint">Введите средние расходы за месяц и фактическое количество рабочих часов. Ставка ₽/час подставится в калькулятор изделий.</div>
+    <div id="b-ohItems"></div>
+    <div class="btns" style="margin:10px 0 16px"><button class="addRow" id="b-addOh" style="margin-left:0">+ статья расходов</button></div>
+    <div class="sub"><span>Итого расходов в месяц</span><span id="b-ohTotal">—</span></div>
+    <div class="row"><span class="nm">Рабочих часов в месяц</span><input class="wide" id="b-hours" type="number" step="1"><span class="u">ч/мес</span></div>
+    <div class="sub" style="font-size:19px"><span>Ставка накладных, ₽/час</span><span id="b-rate">—</span></div>
+  </div>
+
+  <div class="card btns">
+    <button id="b-reset">Сбросить базовые цены и накладные</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const rub=x=>(isFinite(x)?x:0).toLocaleString("ru-RU",{minimumFractionDigits:2,maximumFractionDigits:2})+" ₽";
+const num=x=>(+x).toLocaleString("ru-RU",{maximumFractionDigits:4});
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const UNIT_OPTIONS=["см³","см²","м³","м²","мм","см","м","кг","г","мг","л","мл","шт.","комплект","упак.","₽","%","ч"];
+
+function parseMoney(s){
+  if(s==null)return 0;
+  const t=String(s).replace(/\u00A0/g," ").replace(/,/g,".");
+  let m=t.match(/\d{1,3}(?:\s\d{3})+(?:\.\d+)?/);
+  if(!m)m=t.match(/\d+(?:\.\d+)?/);
+  return m?parseFloat(m[0].replace(/\s/g,"")):0;
+}
+
+function askWithSelect(question, options, defaultValue){
+  return new Promise(resolve=>{
+    const overlay=document.createElement("div");overlay.className="modalOverlay";
+    const box=document.createElement("div");box.className="modalBox";
+    const title=document.createElement("div");title.className="modalTitle";title.textContent=question;
+    const sel=document.createElement("select");
+    options.forEach(o=>{
+      const opt=document.createElement("option");opt.value=o;opt.textContent=o;
+      if(o===defaultValue)opt.selected=true;
+      sel.appendChild(opt);
+    });
+    const btns=document.createElement("div");btns.className="modalBtns";
+    const cancel=document.createElement("button");cancel.textContent="Отмена";
+    const ok=document.createElement("button");ok.textContent="ОК";ok.style.background="var(--c)";ok.style.color="var(--bg)";
+    btns.appendChild(cancel);btns.appendChild(ok);
+    box.appendChild(title);box.appendChild(sel);box.appendChild(btns);
+    overlay.appendChild(box);document.body.appendChild(overlay);
+    function done(v){ if(overlay.parentNode)document.body.removeChild(overlay); resolve(v); }
+    ok.onclick=()=>done(sel.value);
+    cancel.onclick=()=>done(null);
+    overlay.addEventListener("click",e=>{if(e.target===overlay)done(null);});
+    setTimeout(()=>sel.focus(),0);
+  });
+}
+
+const KEY="furs-calc-v2";
+const SYNC_URL_KEY="furs-sync-url";
+const SYNC_KEY_KEY="furs-sync-key";
+const DEF_G={taxRate:0.06};
+const DEF_BASE={
+  polymerBottlePrice:2090, polymerBottleVolume:1, polymerMlPerCm3:2.3923,
+  nsSheetPrice:8500, nsSheetWidth:100, nsSheetLength:30,
+  woods:[
+    {id:"woodOak",    name:"Морёный дуб",      raw:0.40, builtin:true},
+    {id:"woodSapele", name:"Сапеле",            raw:0.40, builtin:true},
+    {id:"woodBirch",  name:"Карельская берёза", raw:1.25, builtin:true}
+  ],
+  ambers:[
+    {id:"amberFine", name:"Янтарь поделочный матовый 1 сорт 5–10 г", kg:145876, builtin:true},
+    {id:"amberRuch", name:"Янтарь прозрачный 4 сорт 20–50 г",        kg:27878,  builtin:true},
+    {id:"amberOrg",  name:"Янтарь прозрачный 3 сорт 100–200 г",      kg:137912, builtin:true}
+  ],
+  materials:[],
+  ohItems:[
+    {n:"Аренда помещения",v:5000},
+    {n:"Коммунальные услуги (ЖКХ)",v:1000},
+    {n:"Электроэнергия",v:800},
+    {n:"Клей",v:500},
+    {n:"Наждачка и расходники",v:800},
+    {n:"Прочее",v:700}
+  ],
+  hoursPerMonth:160
+};
+let S={p:0,v:0,e:{},r:{},g:{...DEF_G},custom:[],vadd:{},varOv:{},base:JSON.parse(JSON.stringify(DEF_BASE)),tab:"calc"};
+try{
+  const x=JSON.parse(localStorage.getItem(KEY));
+  if(x)S=Object.assign(S,x);
+  if(!S.g)S.g={...DEF_G};
+  if(!Array.isArray(S.custom))S.custom=[];
+  if(!S.vadd||typeof S.vadd!=="object")S.vadd={};
+  if(!S.varOv||typeof S.varOv!=="object")S.varOv={};
+  if(!S.base||typeof S.base!=="object")S.base=JSON.parse(JSON.stringify(DEF_BASE));
+  Object.keys(DEF_BASE).forEach(k=>{ if(S.base[k]==null) S.base[k]=JSON.parse(JSON.stringify(DEF_BASE[k])); });
+  if(!Array.isArray(S.base.materials))S.base.materials=[];
+  if(!Array.isArray(S.base.woods)){
+    S.base.woods=[
+      {id:"woodOak",    name:"Морёный дуб",      raw:+(S.base.woodOakRaw!=null?S.base.woodOakRaw:0.40), builtin:true},
+      {id:"woodSapele", name:"Сапеле",            raw:+(S.base.woodOakRaw!=null?S.base.woodOakRaw:0.40), builtin:true},
+      {id:"woodBirch",  name:"Карельская берёза", raw:+(S.base.woodBirchRaw!=null?S.base.woodBirchRaw:1.25), builtin:true}
+    ];
+  } else {
+    const oldOak=S.base.woods.find(w=>w.id==="woodOak" && /дуб.*сапеле|сапеле.*дуб/i.test(String(w.name||"")));
+    if(oldOak){
+      oldOak.name="Морёный дуб";
+      if(!S.base.woods.some(w=>w.id==="woodSapele")){
+        S.base.woods.push({id:"woodSapele",name:"Сапеле",raw:+oldOak.raw||0.40,builtin:true});
+      }
+    }
+  }
+  if(!Array.isArray(S.base.ambers)){
+    S.base.ambers=[
+      {id:"amberFine", name:"Янтарь поделочный матовый 1 сорт 5–10 г", kg:+(S.base.amberFineKg!=null?S.base.amberFineKg:145876), builtin:true},
+      {id:"amberRuch", name:"Янтарь прозрачный 4 сорт 20–50 г",        kg:+(S.base.amberRuchKg!=null?S.base.amberRuchKg:27878),  builtin:true},
+      {id:"amberOrg",  name:"Янтарь прозрачный 3 сорт 100–200 г",      kg:+(S.base.amberOrgKg!=null?S.base.amberOrgKg:137912), builtin:true}
+    ];
+  }
+  if(S.base.polymerBottlePrice==null && S.base.polymerPricePerLiter!=null){
+    S.base.polymerBottleVolume=S.base.polymerBottleVolume||1;
+    S.base.polymerBottlePrice=S.base.polymerPricePerLiter*S.base.polymerBottleVolume;
+  }
+  if(S.base.polymerBottlePrice==null) S.base.polymerBottlePrice=2090;
+  if(S.base.polymerBottleVolume==null) S.base.polymerBottleVolume=1;
+  if(S.base.polymerMlPerCm3==null) S.base.polymerMlPerCm3=2.3923;
+  if(S.base.nsSheetPrice==null) S.base.nsSheetPrice=8500;
+  if(S.base.nsSheetWidth==null) S.base.nsSheetWidth=100;
+  if(S.base.nsSheetLength==null) S.base.nsSheetLength=30;
+}catch(e){}
+
+const getPolymerPricePerLiter=()=>{ const v=+S.base.polymerBottleVolume||1; return v>0?(+S.base.polymerBottlePrice||0)/v:0; };
+const getPolymerPerCm3=()=>getPolymerPricePerLiter()*(+S.base.polymerMlPerCm3||0)/1000;
+const getNsSheetArea=()=>(+S.base.nsSheetWidth||0)*(+S.base.nsSheetLength||0);
+const getNs=()=>{const a=getNsSheetArea();return a>0?(+S.base.nsSheetPrice||0)/a:0;};
+const getOhTotal=()=>(S.base.ohItems||[]).reduce((s,it)=>s+(+it.v||0),0);
+const getOhRate=()=>{const h=+S.base.hoursPerMonth||0;return h>0?getOhTotal()/h:0;};
+
+function getWoodPrice(w){ return (+w.raw||0) + getPolymerPerCm3(); }
+function getAmberPrice(a){ return (+a.kg||0)/1000; }
+
+function getLibraryMaterial(id){
+  if(!id)return null;
+  if(id==="ns")return {n:"Нейзильбер",u:"см²",p:getNs()};
+  if(id.indexOf("wood:")===0){
+    const w=(S.base.woods||[]).find(x=>x.id===id.slice(5));
+    if(w)return {n:w.name,u:"см³",p:getWoodPrice(w)};
+    return null;
+  }
+  if(id.indexOf("amber:")===0){
+    const a=(S.base.ambers||[]).find(x=>x.id===id.slice(6));
+    if(a)return {n:a.name,u:"г",p:getAmberPrice(a)};
+    return null;
+  }
+  if(id.indexOf("custom:")===0){
+    const i=+id.slice(7);const m=S.base.materials[i];
+    if(m)return {n:m.n,u:m.u,p:+m.p||0};
+    return null;
+  }
+  const w=(S.base.woods||[]).find(x=>x.id===id);
+  if(w)return {n:w.name,u:"см³",p:getWoodPrice(w)};
+  const a=(S.base.ambers||[]).find(x=>x.id===id);
+  if(a)return {n:a.name,u:"г",p:getAmberPrice(a)};
+  return null;
+}
+function findInLibrary(name,unit){
+  const k=String(name||"").trim().toLowerCase();
+  if(unit==="см³"){
+    for(const w of S.base.woods){ if(w.name.toLowerCase()===k) return "wood:"+w.id; }
+  }
+  if(unit==="г"||unit==="кг"){
+    for(const a of S.base.ambers){ if(a.name.toLowerCase()===k) return "amber:"+a.id; }
+  }
+  if(k==="нейзильбер"&&(unit==="см²"||unit==="см2")) return "ns";
+  for(let i=0;i<S.base.materials.length;i++){
+    const m=S.base.materials[i];
+    if(m.n.trim().toLowerCase()===k&&m.u===unit)return "custom:"+i;
+  }
+  return null;
+}
+
+const WOOD_STOPWORDS=new Set(["морёный","мореный","карельская","карельский","натуральный","натуральная","стабилизированный","стабилизированная","сорт","фракция","и","с"]);
+function woodAliases(w){
+  const explicit=Array.isArray(w.match)?w.match:[];
+  const auto=String(w.name||"").toLowerCase().split(/[\s/,()]+/)
+    .map(x=>x.replace(/[^a-zа-яё0-9-]/gi,""))
+    .filter(x=>x.length>=3 && !WOOD_STOPWORDS.has(x));
+  const set=new Set();
+  explicit.forEach(x=>{const t=String(x||"").toLowerCase().trim();if(t)set.add(t);});
+  auto.forEach(x=>set.add(x));
+  return [...set];
+}
+function findWoodForVariant(variantName){
+  const l=String(variantName||"").toLowerCase().trim();
+  if(!l)return null;
+  const woods=S.base.woods||[];
+  for(const w of woods){ if(l===String(w.name||"").toLowerCase().trim())return w; }
+  const sorted=[...woods].sort((a,b)=>String(b.name||"").length-String(a.name||"").length);
+  for(const w of sorted){
+    const wn=String(w.name||"").toLowerCase();
+    if(wn && l.includes(wn))return w;
+  }
+  let best=null,bestLen=0;
+  for(const w of woods){
+    for(const a of woodAliases(w)){
+      if(a.length>bestLen && l.includes(a)){best=w;bestLen=a.length;}
+    }
+  }
+  return best;
+}
+function canonAmberId(lid){
+  if(!lid)return null;
+  if(lid.indexOf("amber:")===0)return lid;
+  if(S.base.ambers.some(a=>a.id===lid))return "amber:"+lid;
+  return null;
+}
+function isWoodLike(r,it){
+  if(r && r.kind==="wood") return true;
+  const lid=linkOf(r,it);
+  if(!lid) return false;
+  if(lid.indexOf("wood:")===0) return true;
+  if(S.base.woods.some(w=>w.id===lid)) return true;
+  return false;
+}
+function isAmberLike(r,it){
+  if(r && r.kind && r.kind.indexOf("amber")===0) return true;
+  const lid=linkOf(r,it);
+  if(!lid) return false;
+  if(lid.indexOf("amber:")===0) return true;
+  if(S.base.ambers.some(a=>a.id===lid)) return true;
+  return false;
+}
+function currentWoodId(r,it){
+  const lid=linkOf(r,it);
+  if(!lid)return null;
+  if(lid.indexOf("wood:")===0)return lid;
+  if(S.base.woods.some(w=>w.id===lid))return "wood:"+lid;
+  return null;
+}
+function currentAmberId(r,it){
+  const lid=linkOf(r,it);
+  if(!lid)return null;
+  if(lid.indexOf("amber:")===0)return lid;
+  if(S.base.ambers.some(a=>a.id===lid))return "amber:"+lid;
+  return null;
+}
+
+const R=(n,u,q,p,c,kind)=>({n,u,q,p,c,kind:kind||null});
+const P=(n,v,k,r,rows)=>({n,v,k,r,rows});
+const A_FINE=145.876,A_RUCH=27.878,A_ORG=137.912,W_OAK=5.40,W_BIRCH=6.25,NS=2.8333;
+
+const PRODUCTS=[
+P("Палочки для еды (пара)",["Морёный дуб","Сапеле","Карельская берёза"],0.74,"18 990",[
+ R("Янтарь","г",18,[A_FINE,A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",40,[W_OAK,W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",8,[NS,NS,NS],"m","ns"),
+ R("Спицы","шт.",2,[9,9,9],"m"),
+ R("Футляр деревянный (себест.)","₽",1,[3427,3427,3452],"m"),
+ R("Упаковочный комплект","₽",1,[139,139,139],"m"),
+ R("Накладные расходы","ч",4,null,"o"),
+ R("Оплата труда","₽",1,[2000,2000,2000],"l")
+]),
+P("Ручка",["Морёный дуб","Карельская берёза"],0.74,"10 160",[
+ R("Янтарь (прозр. 20–50 г, 4 сорт)","г",15,[A_RUCH,A_RUCH],"m","amberRuch"),
+ R("Дерево","см³",12,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",6,[NS,NS],"m","ns"),
+ R("Наконечник + стержень","₽",1,[336,336],"m"),
+ R("Футляр картонный","₽",1,[86,86],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Лазерная гравировка (аутсорс)","₽",1,[500,500],"m"),
+ R("Накладные расходы","ч",2.5,null,"o"),
+ R("Оплата труда","₽",1,[1200,1200],"l")
+]),
+P("Кольцо",["Морёный дуб","Карельская берёза"],0.74,"5 740",[
+ R("Янтарь","г",3,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",18,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",2,[NS,NS],"m","ns"),
+ R("Футляр картонный","₽",1,[55,55],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Накладные расходы","ч",1,null,"o"),
+ R("Оплата труда","₽",1,[450,450],"l")
+]),
+P("Кулон",["Морёный дуб","Карельская берёза"],0.54,"8 730",[
+ R("Янтарь","г",7,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",15,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",10,[NS,NS],"m","ns"),
+ R("Колечко подвесное","₽",1,[50,50],"m"),
+ R("Каучуковый шнур","₽",1,[50,50],"m"),
+ R("Футляр картонный","₽",1,[68,68],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Лазерная гравировка","₽",1,[500,500],"m"),
+ R("Накладные расходы","ч",1,null,"o"),
+ R("Оплата труда","₽",1,[450,450],"l")
+]),
+P("Серьги",["Морёный дуб","Карельская берёза"],0.74,"10 960",[
+ R("Янтарь","г",7,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",8,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",12,[NS,NS],"m","ns"),
+ R("Швензы","₽",1,[400,400],"m"),
+ R("Футляр картонный","₽",1,[68,68],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Накладные расходы","ч",1.5,null,"o"),
+ R("Оплата труда","₽",1,[700,700],"l")
+]),
+P("Брошь",["Морёный дуб","Карельская берёза"],0.74,"5 260",[
+ R("Янтарь","г",7,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",15,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",10,[NS,NS],"m","ns"),
+ R("Замок для броши","₽",1,[15,15],"m"),
+ R("Футляр картонный","₽",1,[68,68],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Лазерная гравировка","₽",1,[500,500],"m"),
+ R("Накладные расходы","ч",1,null,"o"),
+ R("Оплата труда","₽",1,[450,450],"l")
+]),
+P("Запонки",["Морёный дуб","Карельская берёза"],0.74,"5 730",[
+ R("Янтарь","г",5,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",2,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",8,[NS,NS],"m","ns"),
+ R("Фурнитура","₽",1,[50,50],"m"),
+ R("Футляр картонный","₽",1,[55,55],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Накладные расходы","ч",1.5,null,"o"),
+ R("Оплата труда","₽",1,[700,700],"l")
+]),
+P("Браслет вида 1 (деревянные звенья)",["Морёный дуб","Карельская берёза"],0.54,"15 200",[
+ R("Янтарь","г",7,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",30,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",10,[NS,NS],"m","ns"),
+ R("Резинка и бусины","₽",1,[50,50],"m"),
+ R("Футляр картонный","₽",1,[68,68],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Лазерная гравировка","₽",1,[500,500],"m"),
+ R("Накладные расходы","ч",2.5,null,"o"),
+ R("Оплата труда","₽",1,[2000,2000],"l")
+]),
+P("Браслет вида 2 (янтарные звенья)",["Морёный дуб","Карельская берёза"],0.74,"22 000",[
+ R("Янтарь","г",21,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",30,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",22,[NS,NS],"m","ns"),
+ R("Резинка","₽",1,[20,20],"m"),
+ R("Бусины","₽",1,[30,30],"m"),
+ R("Футляр картонный","₽",1,[68,68],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Лазерная гравировка","₽",1,[500,500],"m"),
+ R("Накладные расходы","ч",4,null,"o"),
+ R("Оплата труда","₽",1,[2800,2800],"l")
+]),
+P("Шпилька для волос (китайская)",["Морёный дуб","Карельская берёза"],0.74,"5 280",[
+ R("Янтарь","г",4,[A_FINE,A_FINE],"m","amberFine"),
+ R("Дерево","см³",15,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",2,[NS,NS],"m","ns"),
+ R("Футляр (для заколок)","₽",1,[86,86],"m"),
+ R("Упаковочный комплект","₽",1,[139,139],"m"),
+ R("Накладные расходы","ч",1.5,null,"o"),
+ R("Оплата труда","₽",1,[450,450],"l")
+]),
+P("Органайзер настольный",["Морёный дуб","Карельская берёза"],0.74,"62 000 – 88 000",[
+ R("Янтарь (прозр. 100–200 г, 3 сорт)","г",125,[A_ORG,A_ORG],"m","amberOrg"),
+ R("Дерево","см³",515,[W_OAK,W_BIRCH],"m","wood"),
+ R("Нейзильбер","см²",10,[NS,NS],"m","ns"),
+ R("Упаковка","₽",1,[627,627],"m"),
+ R("Лазерная гравировка","₽",1,[1000,1000],"m"),
+ R("Накладные расходы","ч",5,null,"o"),
+ R("Оплата труда","₽",1,[3000,3000],"l")
+]),
+P("Персонализированный деревянный футляр",["Ясень","Морёный дуб","Карельская берёза"],0.74,null,[
+ R("Дерево","см³",30,[0,W_OAK,W_BIRCH],"m","wood"),
+ R("Фурнитура, клей","₽",1,[100,100,100],"m"),
+ R("Лазерная гравировка","₽",1,[1000,1000,1000],"m"),
+ R("Накладные расходы","ч",3,null,"o"),
+ R("Оплата труда","₽",1,[2000,2000,2000],"l")
+])
+];
+
+function rebuildPrices(){
+  PRODUCTS.forEach(p=>{
+    p.rows.forEach(r=>{
+      if(!r.kind)return;
+      const n=p.v.length;
+      if(r.kind==="wood"){
+        const arr=[];
+        for(let i=0;i<n;i++){
+          const w=findWoodForVariant(p.v[i]);
+          arr.push(w?getWoodPrice(w):0);
+        }
+        r.p=arr;
+      }else if(r.kind==="ns"){
+        r.p=new Array(n).fill(getNs());
+      }else{
+        const a=S.base.ambers.find(x=>x.id===r.kind);
+        if(a)r.p=new Array(n).fill(getAmberPrice(a));
+      }
+    });
+  });
+}
+
+(function applyVadd(){
+  if(!S.vadd||typeof S.vadd!=="object")return;
+  Object.keys(S.vadd).forEach(pid=>{
+    const p=PRODUCTS[pid];
+    if(!p||!Array.isArray(S.vadd[pid]))return;
+    if(S.varOv[pid])return;
+    S.vadd[pid].forEach(v=>{
+      const idx=p.v.length;
+      p.v.push(v.name);
+      p.rows.forEach((r,i)=>{
+        if(Array.isArray(r.p)){
+          const src=(v.prices&&v.prices[i]!=null)?v.prices[i]:(r.p[idx-1]!=null?r.p[idx-1]:0);
+          r.p.push(src);
+        }
+      });
+    });
+  });
+})();
+
+function applyVarOv(){
+  if(!S.varOv||typeof S.varOv!=="object")return;
+  Object.keys(S.varOv).forEach(pid=>{
+    const p=PRODUCTS[pid];
+    if(!p)return;
+    const ov=S.varOv[pid];
+    if(!ov||!Array.isArray(ov.v))return;
+    p.v=ov.v.slice();
+    p.rows.forEach((r,i)=>{
+      if(Array.isArray(ov.pPerRow)&&Array.isArray(ov.pPerRow[i])){
+        r.p=ov.pPerRow[i].slice();
+      }
+    });
+  });
+}
+function captureVarOv(p){
+  const pid=PRODUCTS.indexOf(p);
+  if(pid<0)return;
+  if(!S.varOv)S.varOv={};
+  S.varOv[pid]={
+    v:p.v.slice(),
+    pPerRow:p.rows.map(r=>Array.isArray(r.p)?r.p.slice():[])
+  };
+}
+
+rebuildPrices();
+applyVarOv();
+
+const allProducts=()=>PRODUCTS.concat(S.custom||[]);
+const Pr=()=>allProducts()[S.p]||PRODUCTS[0];
+const isCustom=()=>S.p>=PRODUCTS.length;
+const stateKey=()=>S.p+"|"+S.v;
+const E=()=>{
+  const k=stateKey();
+  if(!S.e[k])S.e[k]={q:{},p:{},extra:[],links:{}};
+  if(!Array.isArray(S.e[k].extra))S.e[k].extra=[];
+  if(!S.e[k].links||typeof S.e[k].links!=="object")S.e[k].links={};
+  return S.e[k];
+};
+const baseRows=()=>Pr().rows||[];
+function allRows(){
+  const out=[];
+  baseRows().forEach((r,i)=>out.push({r,i,k:'b'}));
+  E().extra.forEach((r,i)=>out.push({r,i,k:'e'}));
+  return out;
+}
+function rowKey(it){ return it.k + ":" + it.i; }
+function linkOf(r,it){
+  if(it){
+    const ov=E().links[rowKey(it)];
+    if(ov) return ov;
+  }
+  if(r.link) return r.link;
+  if(r.kind) return r.kind;
+  return null;
+}
+const getQ=it=>it.k==='e'?it.r.q:(E().q[it.i]!=null?E().q[it.i]:it.r.q);
+const baseP=it=>{
+  const r=it.r;
+  const lid=linkOf(r,it);
+  if(lid){const m=getLibraryMaterial(lid);if(m)return m.p;}
+  if(r.c==="o")return getOhRate();
+  return r.p?r.p[S.v]:0;
+};
+const getP=it=>{
+  const lid=linkOf(it.r,it);
+  if(lid){const m=getLibraryMaterial(lid);if(m)return m.p;}
+  if(it.k==='e')return it.r.p;
+  if(E().p[it.i]!=null)return E().p[it.i];
+  return baseP(it);
+};
+const setQ=(it,v)=>{if(it.k==='e'){it.r.q=v;return;}const b=it.r.q;if(Math.abs(v-b)<1e-9)delete E().q[it.i];else E().q[it.i]=v;};
+const setP=(it,v)=>{
+  if(linkOf(it.r,it))return;
+  if(it.k==='e'){it.r.p=v;return;}
+  const b=baseP(it);
+  if(Math.abs(v-b)<1e-9)delete E().p[it.i];else E().p[it.i]=v;
+};
+
+// === УПРАВЛЕНИЕ ПРИБЫЛЬЮ И НАЛОГОМ ===
+const getBaseProfit = () => 1 - Pr().k - 0.06;
+const getProfit = () => E().profit !== undefined ? E().profit : getBaseProfit();
+const getBaseTax = () => S.g.taxRate || 0.06;
+const getTax = () => E().tax !== undefined ? E().tax : getBaseTax();
+const retail=()=>S.r[S.p]!=null?S.r[S.p]:(Pr().r||"");
+
+/* ============ Облачная синхронизация (Firebase) ============ */
+const SYNC={url:"",key:"",enabled:false,pushing:false,saveTimer:null};
+function sanitizeKey(k){ return String(k||"").replace(/[.#$\[\]\/]/g,"_").trim(); }
+function syncApiUrl(){
+  const base=SYNC.url.replace(/\/+$/,"");
+  const k=sanitizeKey(SYNC.key);
+  return base + "/sync/" + encodeURIComponent(k) + ".json";
+}
+function setSyncStatus(text,cls){
+  const el=$("syncStatus");
+  el.textContent=text;
+  el.classList.remove("ok","err","work");
+  if(cls)el.classList.add(cls);
+}
+function syncLoadSettings(){
+  try{
+    SYNC.url=localStorage.getItem(SYNC_URL_KEY)||"";
+    SYNC.key=localStorage.getItem(SYNC_KEY_KEY)||"";
+    SYNC.enabled=!!(SYNC.url&&SYNC.key);
+    $("syncUrl").value=SYNC.url;
+    $("syncKey").value=SYNC.key;
+    if(SYNC.enabled)setSyncStatus("Подключено","ok");
+    else setSyncStatus("Не подключено");
+  }catch(e){}
+}
+function syncSaveSettings(){
+  try{
+    if(SYNC.url)localStorage.setItem(SYNC_URL_KEY,SYNC.url);else localStorage.removeItem(SYNC_URL_KEY);
+    if(SYNC.key)localStorage.setItem(SYNC_KEY_KEY,SYNC.key);else localStorage.removeItem(SYNC_KEY_KEY);
+  }catch(e){}
+}
+async function syncPush(){
+  if(!SYNC.enabled||SYNC.pushing)return;
+  SYNC.pushing=true;
+  try{
+    const r=await fetch(syncApiUrl(),{
+      method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(S)
+    });
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    setSyncStatus("Синхронизировано","ok");
+  }catch(e){
+    setSyncStatus("Ошибка отправки: "+e.message,"err");
+  }finally{
+    SYNC.pushing=false;
+  }
+}
+async function syncPull(silent){
+  if(!SYNC.enabled){
+    if(!silent)alert("Сначала нажмите «Подключить».");
+    return false;
+  }
+  try{
+    if(!silent) setSyncStatus("Загрузка...","work");
+    const r=await fetch(syncApiUrl());
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const data=await r.json();
+    if(!data||typeof data!=="object"||!(data.base||data.custom||data.e)){
+      if(silent){ setSyncStatus("Подключено","ok"); return true; }
+      setSyncStatus("На сервере пусто, отправляю локальные...","work");
+      await syncPush();
+      return false;
+    }
+    let same=false;
+    try{ same = JSON.stringify(S) === JSON.stringify(data); }catch(e){ same=false; }
+    if(same){
+      setSyncStatus("Подключено","ok");
+      return true;
+    }
+    const prevTab=S.tab;
+    S=Object.assign({p:0,v:0,e:{},r:{},g:{...DEF_G},custom:[],vadd:{},varOv:{},base:JSON.parse(JSON.stringify(DEF_BASE)),tab:"calc"},data);
+    if(!S.g)S.g={...DEF_G};
+    if(!Array.isArray(S.custom))S.custom=[];
+    if(!S.vadd||typeof S.vadd!=="object")S.vadd={};
+    if(!S.varOv||typeof S.varOv!=="object")S.varOv={};
+    if(!S.base||typeof S.base!=="object")S.base=JSON.parse(JSON.stringify(DEF_BASE));
+    if(!Array.isArray(S.base.materials))S.base.materials=[];
+    if(!Array.isArray(S.base.woods)){
+      S.base.woods=[
+        {id:"woodOak",    name:"Морёный дуб",      raw:0.40, builtin:true},
+        {id:"woodSapele", name:"Сапеле",            raw:0.40, builtin:true},
+        {id:"woodBirch",  name:"Карельская берёза", raw:1.25, builtin:true}
+      ];
+    }
+    if(!Array.isArray(S.base.ambers)){
+      S.base.ambers=[
+        {id:"amberFine", name:"Янтарь поделочный матовый 1 сорт 5–10 г", kg:145876, builtin:true},
+        {id:"amberRuch", name:"Янтарь прозрачный 4 сорт 20–50 г",        kg:27878,  builtin:true},
+        {id:"amberOrg",  name:"Янтарь прозрачный 3 сорт 100–200 г",      kg:137912, builtin:true}
+      ];
+    }
+    if(!S.base.ohItems)S.base.ohItems=[];
+    if(S.base.polymerBottlePrice==null) S.base.polymerBottlePrice=2090;
+    if(S.base.polymerBottleVolume==null) S.base.polymerBottleVolume=1;
+    if(S.base.polymerMlPerCm3==null) S.base.polymerMlPerCm3=2.3923;
+    if(S.base.nsSheetPrice==null) S.base.nsSheetPrice=8500;
+    if(S.base.nsSheetWidth==null) S.base.nsSheetWidth=100;
+    if(S.base.nsSheetLength==null) S.base.nsSheetLength=30;
+    if(S.base.hoursPerMonth==null) S.base.hoursPerMonth=160;
+    S.tab=prevTab||S.tab||"calc";
+    try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){}
+    rebuildPrices();
+    applyVarOv();
+    build();
+    switchTab(S.tab);
+    setSyncStatus("Подключено","ok");
+    setTimeout(()=>syncPush(),300);
+    return true;
+  }catch(e){
+    setSyncStatus("Ошибка загрузки: "+e.message,"err");
+    return false;
+  }
+}
+function syncSchedulePush(){
+  if(!SYNC.enabled)return;
+  clearTimeout(SYNC.saveTimer);
+  SYNC.saveTimer=setTimeout(()=>{syncPush();},1200);
+}
+
+$("syncConnectBtn").onclick=async()=>{
+  const url=$("syncUrl").value.trim().replace(/\/+$/,"");
+  const key=$("syncKey").value.trim();
+  if(!url||!key){alert("Заполните оба поля: адрес базы данных и код синхронизации.");return;}
+  if(!/^https?:\/\//i.test(url)){alert("Адрес должен начинаться с https://");return;}
+  SYNC.url=url;SYNC.key=key;SYNC.enabled=true;
+  syncSaveSettings();
+  setSyncStatus("Проверка связи...","work");
+  const ok=await syncPull(true);
+  if(!ok){
+    try{
+      const r=await fetch(syncApiUrl());
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      setSyncStatus("Подключено. Синхронизация работает","ok");
+    }catch(e){
+      setSyncStatus("Не удалось подключиться: "+e.message,"err");
+      SYNC.enabled=false;syncSaveSettings();
+    }
+  }
+};
+$("syncDisconnectBtn").onclick=()=>{
+  if(!confirm("Отключить синхронизацию? Данные останутся в этом браузере."))return;
+  SYNC.enabled=false;SYNC.url="";SYNC.key="";
+  syncSaveSettings();
+  $("syncUrl").value="";$("syncKey").value="";
+  setSyncStatus("Не подключено");
+};
+$("syncPullBtn").onclick=async()=>{
+  if(!SYNC.enabled){alert("Сначала нажмите «Подключить».");return;}
+  if(!confirm("Скачать данные с сервера? Текущие настройки в этом браузере будут заменены."))return;
+  await syncPull();
+};
+$("syncPushBtn").onclick=async()=>{
+  if(!SYNC.enabled){alert("Сначала нажмите «Подключить».");return;}
+  await syncPush();
+};
+/* ============ Конец блока синхронизации ============ */
+
+let savedTimer=null;
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+ const el=$("saved");if(el){el.textContent="Сохранено "+new Date().toLocaleTimeString("ru-RU");clearTimeout(savedTimer);savedTimer=setTimeout(()=>el.textContent="",3000);}
+ syncSchedulePush();
+}
+function opts(el,list,val){el.innerHTML=list.map((t,i)=>`<option value="${i}">${esc(t)}</option>`).join("");el.value=val;}
+
+function renderRows(){
+ const mEl=$("mat"),wEl=$("wrk");mEl.innerHTML="";wEl.innerHTML="";
+ allRows().forEach((it,idx)=>{
+  const r=it.r,q=getQ(it),p=getP(it),isRub=r.u==="₽",isExtra=it.k==='e';
+  const linkId=linkOf(r,it);
+  const woodRow=isWoodLike(r,it);
+  const amberRow=isAmberLike(r,it);
+  const div=document.createElement("div");div.className="row";div.dataset.idx=idx;
+  const qChanged=E().q[it.i]!=null;
+  const pChanged=E().p[it.i]!=null;
+  const showBadge=(qChanged||pChanged)&&!linkId?"":((qChanged||pChanged)?'<span class="mod" title="Изменено вручную">изм.</span>':"");
+  const delBtn=isExtra?`<button class="del" data-del="${it.i}" title="Удалить строку">×</button>`:"";
+  const lock=linkId?" readonly":"";
+  let nameHtml;
+  if(woodRow){
+    const curId=currentWoodId(r,it);
+    const optsHtml=S.base.woods.map(w=>{
+      const id="wood:"+w.id;
+      return `<option value="${esc(id)}"${id===curId?" selected":""}>${esc(w.name)}</option>`;
+    }).join("");
+    nameHtml=`<span class="nm"><select class="linkSelect" data-idx="${idx}" data-kind="wood">${optsHtml}<option value="__other__">— Другое (ввести вручную) —</option></select>${showBadge}</span>`;
+  }else if(amberRow){
+    const curId=currentAmberId(r,it);
+    const optsHtml=S.base.ambers.map(a=>{
+      const id="amber:"+a.id;
+      return `<option value="${esc(id)}"${id===curId?" selected":""}>${esc(a.name)}</option>`;
+    }).join("");
+    nameHtml=`<span class="nm"><select class="linkSelect" data-idx="${idx}" data-kind="amber">${optsHtml}<option value="__other__">— Другое (ввести вручную) —</option></select>${showBadge}</span>`;
+  }else{
+    nameHtml=`<span class="nm">${esc(r.n)}${showBadge}</span>`;
+  }
+  let inner=nameHtml;
+  if(isRub){
+   inner+=`<input class="pr" type="number" step="0.01" value="${p}" data-f="p" data-idx="${idx}"${lock}> <span class="u">₽</span>`;
+  }else{
+   inner+=`<input type="number" step="any" value="${q}" data-f="q" data-idx="${idx}"> <span class="u">${esc(r.u)}</span> <span class="x">×</span> <input class="pr" type="number" step="0.01" value="${p}" data-f="p" data-idx="${idx}"${lock}> <span class="u">₽/${esc(r.u)}</span>`;
+  }
+  inner+=`<span class="sum">${rub(q*p)}</span>${delBtn}`;
+  div.innerHTML=inner;
+  (r.c==="m"?mEl:wEl).appendChild(div);
+ });
+ document.querySelectorAll(".row input").forEach(inp=>{
+  if(inp.readOnly)return;
+  inp.oninput=()=>{
+   const idx=+inp.dataset.idx,f=inp.dataset.f;
+   const it=allRows()[idx];if(!it)return;
+   const v=parseFloat(inp.value.replace(",","."));
+   if(isNaN(v))return;
+   if(f==="q")setQ(it,v);else setP(it,v);
+   calc();save();
+  };
+ });
+ document.querySelectorAll(".row select.linkSelect").forEach(sel=>{
+  sel.onchange=async()=>{
+   const idx=+sel.dataset.idx;
+   const it=allRows()[idx];if(!it)return;
+   const v=sel.value;
+   const kind=sel.dataset.kind;
+   if(v==="__other__"){
+     await addOtherMaterial(it,kind);
+     return;
+   }
+   delete E().links[rowKey(it)];
+   const natId=linkOf(it.r,{r:it.r,i:it.i,k:'nat'})||it.r.link||it.r.kind;
+   let keep=false;
+   if(it.r.kind==="wood"){
+     const w=S.base.woods.find(x=>"wood:"+x.id===v);
+     const auto=findWoodForVariant(Pr().v[S.v]);
+     if(w && auto && auto.id===w.id) keep=false;
+     else keep=true;
+   } else if(it.r.kind && it.r.kind.indexOf("amber")===0){
+     if(v===it.r.kind) keep=false;
+     else keep=true;
+   } else {
+     if(v===it.r.link) keep=false;
+     else keep=true;
+   }
+   if(keep) E().links[rowKey(it)]=v;
+   renderRows();calc();save();
+  };
+ });
+ document.querySelectorAll("#mat .del, #wrk .del").forEach(b=>{
+  b.onclick=()=>{
+   const i=+b.dataset.del;
+   E().extra.splice(i,1);
+   renderRows();calc();save();
+  };
+ });
+}
+
+async function addOtherMaterial(it, kind){
+  if(kind==="wood"){
+    const name=(prompt("Название породы (например: Дуб красный):","")||"").trim();
+    if(!name)return;
+    const raw=parseFloat((prompt("Стоимость сырья, ₽/см³ (без стабилизации):","0")||"0").replace(",","."))||0;
+    const id="uw"+Date.now();
+    S.base.woods.push({id:id,name:name,raw:raw});
+    E().links[rowKey(it)]="wood:"+id;
+    rebuildPrices();
+    renderRows();calc();renderBase();save();
+  }else if(kind==="amber"){
+    const name=(prompt("Название сорта янтаря:","")||"").trim();
+    if(!name)return;
+    const kg=parseFloat((prompt("Цена, ₽/кг:","0")||"0").replace(",","."))||0;
+    const id="ua"+Date.now();
+    S.base.ambers.push({id:id,name:name,kg:kg});
+    E().links[rowKey(it)]="amber:"+id;
+    rebuildPrices();
+    renderRows();calc();renderBase();save();
+  }
+}
+
+function calc(){
+ const t={m:0,o:0,l:0};
+ allRows().forEach((it,idx)=>{
+  const q=getQ(it),p=getP(it),tot=q*p;
+  t[it.r.c]+=tot;
+  const rowEl=document.querySelector(`.row[data-idx="${idx}"]`);
+  if(rowEl){
+   rowEl.querySelector(".sum").textContent=rub(tot);
+  }
+ });
+ const s1=t.m+t.o,s2=s1+t.l;
+ 
+ // === РАСЧЕТ НА ОСНОВЕ НАЛОГА И ПРИБЫЛИ ===
+ const taxRate = getTax();
+ const profitRate = getProfit();
+ const k = 1 - taxRate - profitRate;
+ const rec = k > 0 ? s2 / k : 0; 
+
+ const retailNum=parseMoney(retail());
+ const tax=retailNum*taxRate;
+ const np=retailNum-s2-tax;
+ const rp=retailNum?np/retailNum*100:0;
+
+ $("tm").textContent=rub(t.m);$("to").textContent=rub(t.o);$("tl").textContent=rub(t.l);
+ $("s1").textContent=rub(s1);$("s2").textContent=rub(s2);
+ $("rec").textContent=rub(rec);
+ $("tx").textContent=rub(tax);
+ $("txl").textContent="("+num(taxRate*100)+" % от действующей цены)";
+ $("np").textContent=rub(np);
+ $("rp").textContent=(retailNum?rp.toLocaleString("ru-RU",{maximumFractionDigits:2}):"0")+" %";
+ 
+ if(document.activeElement!==$("profit"))$("profit").value=+(profitRate*100).toFixed(2);
+ $("km").innerHTML=E().profit!=null?`<span class="mod" title="Исходное: ${num(getBaseProfit()*100)}%">изм.</span>`:"";
+ 
+ if(document.activeElement!==$("tax"))$("tax").value=+(taxRate*100).toFixed(2);
+ $("txm").innerHTML=E().tax!=null?`<span class="mod" title="Исходное: ${num(getBaseTax()*100)}%">изм.</span>`:"";
+
+ const rtEl=$("rt");
+ rtEl.classList.remove("good","bad");
+ if(retailNum>0&&rec>0){
+  if(retailNum>=rec)rtEl.classList.add("good");
+  else rtEl.classList.add("bad");
+ }
+}
+
+function build(){
+ const list=allProducts();
+ if(!list[S.p])S.p=0;
+ if(!Pr().v[S.v])S.v=0;
+ opts($("ps"),list.map(p=>p.n),S.p);
+ opts($("vs"),Pr().v,S.v);
+ $("rt").value=retail();
+ renderRows();calc();
+}
+
+$("ps").onchange=e=>{S.p=+e.target.value;S.v=0;build();save();};
+$("vs").onchange=e=>{S.v=+e.target.value;build();save();};
+
+// === СОБЫТИЯ ДЛЯ НАЛОГА И ПРИБЫЛИ ===
+$("tax").oninput=e=>{
+  const v=parseFloat(e.target.value);
+  if(isNaN(v) || v < 0 || v > 100) return;
+  const newTax = v / 100;
+  if (Math.abs(newTax - getBaseTax()) < 1e-9) delete E().tax;
+  else E().tax = newTax;
+  calc(); save();
+};
+
+$("profit").oninput=e=>{
+  const v=parseFloat(e.target.value);
+  if(isNaN(v) || v < 0 || v > 100) return;
+  const newProfit = v / 100;
+  if (Math.abs(newProfit - getBaseProfit()) < 1e-9) delete E().profit;
+  else E().profit = newProfit;
+  calc(); save();
+};
+
+$("rt").oninput=e=>{S.r[S.p]=e.target.value;calc();save();};
+
+/* ===== Управление вариантами ===== */
+
+$("addVarBtn").onclick=()=>{
+ const p=Pr();
+ const name=(prompt("Название нового варианта:","Новый вариант")||"").trim();if(!name)return;
+ const srcIdx=S.v;
+ if(isCustom()){
+  p.rows.forEach(r=>{
+   if(Array.isArray(r.p)) r.p.push(r.p[srcIdx]!=null?r.p[srcIdx]:(r.p[r.p.length-1]||0));
+  });
+  p.v.push(name);
+ }else{
+  p.v.push(name);
+  p.rows.forEach(r=>{
+   if(Array.isArray(r.p)) r.p.push(r.p[srcIdx]!=null?r.p[srcIdx]:(r.p[r.p.length-1]||0));
+  });
+  captureVarOv(p);
+ }
+ S.v=p.v.length-1;
+ build();save();
+};
+
+$("delVarBtn").onclick=()=>{
+ const p=Pr();
+ if(p.v.length<=1){alert("Нельзя удалить единственный вариант.");return;}
+ const idx=S.v;
+ const nm=p.v[idx];
+ if(!confirm("Удалить вариант «"+nm+"»? Данные по нему будут потеряны."))return;
+
+ if(isCustom()){
+  p.v.splice(idx,1);
+  p.rows.forEach(r=>{ if(Array.isArray(r.p)) r.p.splice(idx,1); });
+ }else{
+  p.v.splice(idx,1);
+  p.rows.forEach(r=>{ if(Array.isArray(r.p)) r.p.splice(idx,1); });
+  captureVarOv(p);
+ }
+ const newE={};
+ Object.keys(S.e).forEach(k=>{
+  const m=k.match(/^(\d+)\|(\d+)$/);
+  if(!m){newE[k]=S.e[k];return;}
+  const Pp=+m[1],V=+m[2];
+  if(Pp!==S.p){newE[k]=S.e[k];return;}
+  if(V===idx)return;
+  const newV=V>idx?V-1:V;
+  newE[Pp+"|"+newV]=S.e[k];
+ });
+ S.e=newE;
+ if(S.v>=p.v.length)S.v=p.v.length-1;
+ build();save();
+};
+
+$("renameVarBtn").onclick=()=>{
+ const p=Pr();
+ const idx=S.v;
+ const old=p.v[idx];
+ const nn=prompt("Новое название варианта:",old);
+ if(nn===null)return;
+ const t=nn.trim();
+ if(!t||t===old)return;
+ p.v[idx]=t;
+ if(!isCustom()) captureVarOv(p);
+ build();save();
+};
+
+$("r1").onclick=()=>{
+ if(!isCustom()&&S.vadd && S.vadd[S.p]) delete S.vadd[S.p];
+ if(!isCustom()&&S.varOv && S.varOv[S.p]) delete S.varOv[S.p];
+ const prefix=String(S.p)+"|";
+ Object.keys(S.e).forEach(k=>{ if(k.indexOf(prefix)===0) delete S.e[k]; });
+ delete S.r[S.p];
+ S.v=0;
+ location.reload();
+};
+
+$("r2").onclick=()=>{
+ if(!confirm("Сбросить все изменения?"))return;
+ try{localStorage.removeItem(KEY);}catch(e){}
+ location.reload();
+};
+
+function exportData(){
+  try{
+    const data=JSON.stringify(S,null,2);
+    const blob=new Blob([data],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    const d=new Date();
+    const stamp=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    a.href=url;a.download="furs-calculator-"+stamp+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    const el=$("saved");
+    if(el){el.textContent="Файл сохранён в загрузки";clearTimeout(savedTimer);savedTimer=setTimeout(()=>el.textContent="",3000);}
+  }catch(e){alert("Не удалось сохранить файл: "+e.message);}
+}
+function importData(file){
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    let imported;
+    try{ imported=JSON.parse(ev.target.result); }
+    catch(err){ alert("Не удалось прочитать файл."); return; }
+    if(!imported||typeof imported!=="object"){alert("Файл не похож на данные калькулятора.");return;}
+    if(!confirm("Импортировать данные? Текущие настройки будут заменены.")) return;
+    try{ localStorage.setItem(KEY,JSON.stringify(imported)); }
+    catch(e){ alert("Не удалось сохранить: "+e.message); return; }
+    alert("Данные загружены! Страница обновится.");
+    location.reload();
+  };
+  reader.onerror=function(){ alert("Не удалось прочитать файл."); };
+  reader.readAsText(file);
+}
+$("exportBtn").onclick=exportData;
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=(e)=>{
+  const f=e.target.files&&e.target.files[0];
+  if(f) importData(f);
+  e.target.value="";
+};
+
+$("addProd").onclick=()=>{
+ const name=(prompt("Название нового изделия:")||"").trim();if(!name)return;
+ const variant=(prompt("Название варианта исполнения:","Стандарт")||"Стандарт").trim()||"Стандарт";
+ const profitPct=parseFloat((prompt("Желаемая прибыль, % (например, 20 или 40):","20")||"20").replace(",","."));
+ const profitRate=(isNaN(profitPct)?20:profitPct)/100;
+ const k=1-0.06-profitRate;
+ const rt=prompt("Действующая розничная цена (можно пустым):","")||"";
+ S.custom.push({n:name,v:[variant],k:k,r:rt,rows:[]});
+ S.p=allProducts().length-1;S.v=0;build();save();
+ alert("Изделие создано. Добавьте строки через «+ строка», «+ накладные», «+ оплата труда».");
+};
+
+$("delProd").onclick=()=>{
+ if(!isCustom()){alert("Встроенные изделия удалить нельзя. Используйте «Сбросить изделие».");return;}
+ if(!confirm("Удалить это изделие со всеми его строками?"))return;
+ S.custom.splice(S.p-PRODUCTS.length,1);
+ const prefix=String(S.p)+"|";
+ Object.keys(S.e).forEach(k=>{ if(k.indexOf(prefix)===0) delete S.e[k]; });
+ delete S.r[S.p];
+ S.p=0;S.v=0;build();save();
+};
+
+$("addMat").onclick=async()=>{
+ const n=(prompt("Название материала:")||"").trim();if(!n)return;
+ const u=await askWithSelect("Выберите единицу измерения:", UNIT_OPTIONS, "шт.");
+ if(!u)return;
+ const q=parseFloat((prompt("Количество:","1")||"1").replace(",","."));
+ const link=findInLibrary(n,u);
+ let p=0;
+ if(link){
+  const m=getLibraryMaterial(link);
+  if(m){p=m.p;alert("Материал найден в библиотеке, цена подтянута автоматически: "+rub(p)+" / "+m.u);}
+ } else {
+  p=parseFloat((prompt("Цена за единицу, ₽:","0")||"0").replace(",","."))||0;
+ }
+ E().extra.push({n:n,u:u,q:isFinite(q)?q:1,p:p,c:"m",link:link});
+ renderRows();calc();save();
+};
+$("addOh").onclick=()=>{
+ const n=(prompt("Название накладного расхода:","Дополнительные накладные")||"Дополнительные накладные").trim();
+ const q=parseFloat((prompt("Норма времени, ч:","1")||"1").replace(",","."));
+ E().extra.push({n:n,u:"ч",q:isFinite(q)?q:1,p:getOhRate(),c:"o"});
+ renderRows();calc();save();
+};
+$("addLb").onclick=()=>{
+ const n=(prompt("Название статьи оплаты труда:","Дополнительная работа")||"Дополнительная работа").trim();
+ const p=parseFloat((prompt("Сумма, ₽:","0")||"0").replace(",","."));
+ E().extra.push({n:n,u:"₽",q:1,p:isFinite(p)?p:0,c:"l"});
+ renderRows();calc();save();
+};
+
+/* ===== Вкладка «Накладные» ===== */
+
+function renderWoodList(){
+ const list=$("b-woodList");list.innerHTML="";
+ S.base.woods.forEach((w,i)=>{
+  const div=document.createElement("div");div.className="row";
+  const delBtn=w.builtin?"":`<button class="del" data-delw="${i}" title="Удалить">×</button>`;
+  div.innerHTML=
+    `<span class="nm">${esc(w.name)}</span>
+     <input type="number" step="0.01" value="${+w.raw||0}" data-wraw="${i}">
+     <span class="u">₽/см³ сырьё</span>
+     <span class="x">+ стабилизация =</span>
+     <span class="sum" data-wsum="${i}">${rub(getWoodPrice(w))} / см³</span>
+     ${delBtn}`;
+  list.appendChild(div);
+ });
+ list.querySelectorAll("[data-wraw]").forEach(inp=>{
+  inp.oninput=()=>{
+   const v=parseFloat(inp.value.replace(",","."));
+   if(isNaN(v))return;
+   const i=+inp.dataset.wraw;
+   S.base.woods[i].raw=v;
+   const s=list.querySelector(`[data-wsum="${i}"]`);
+   if(s)s.textContent=rub(getWoodPrice(S.base.woods[i]))+" / см³";
+   renderBaseTotals();updateDerived();save();
+  };
+ });
+ list.querySelectorAll("[data-delw]").forEach(b=>{
+  b.onclick=()=>{
+   const i=+b.dataset.delw;
+   const w=S.base.woods[i];
+   if(!confirm("Удалить породу «"+w.name+"»?"))return;
+   const rid=w.id;
+   S.base.woods.splice(i,1);
+   Object.values(S.e).forEach(e=>{
+    if(e.links){
+     Object.keys(e.links).forEach(k=>{
+      if(e.links[k]==="wood:"+rid) delete e.links[k];
+     });
+    }
+    if(Array.isArray(e.extra)){
+     e.extra.forEach(r=>{
+      if(r.link==="wood:"+rid)delete r.link;
+     });
+    }
+   });
+   rebuildPrices();
+   renderBase();updateDerived();save();
+  };
+ });
+}
+
+function renderAmberList(){
+ const list=$("b-amberList");list.innerHTML="";
+ S.base.ambers.forEach((a,i)=>{
+  const div=document.createElement("div");div.className="row";
+  const delBtn=a.builtin?"":`<button class="del" data-dela="${i}" title="Удалить">×</button>`;
+  div.innerHTML=
+    `<span class="nm">${esc(a.name)}</span>
+     <input type="number" step="1" value="${+a.kg||0}" data-akg="${i}">
+     <span class="u">₽/кг</span>
+     <span class="x">=</span>
+     <span class="sum" data-asum="${i}">${rub(getAmberPrice(a))} / г</span>
+     ${delBtn}`;
+  list.appendChild(div);
+ });
+ list.querySelectorAll("[data-akg]").forEach(inp=>{
+  inp.oninput=()=>{
+   const v=parseFloat(inp.value.replace(",","."));
+   if(isNaN(v))return;
+   const i=+inp.dataset.akg;
+   S.base.ambers[i].kg=v;
+   const s=list.querySelector(`[data-asum="${i}"]`);
+   if(s)s.textContent=rub(getAmberPrice(S.base.ambers[i]))+" / г";
+   renderBaseTotals();updateDerived();save();
+  };
+ });
+ list.querySelectorAll("[data-dela]").forEach(b=>{
+  b.onclick=()=>{
+   const i=+b.dataset.dela;
+   const a=S.base.ambers[i];
+   if(!confirm("Удалить сорт «"+a.name+"»?"))return;
+   const rid=a.id;
+   const linkId="amber:"+rid;
+   S.base.ambers.splice(i,1);
+   Object.values(S.e).forEach(e=>{
+    if(e.links){
+     Object.keys(e.links).forEach(k=>{
+      if(e.links[k]===linkId) delete e.links[k];
+     });
+    }
+    if(Array.isArray(e.extra)){
+     e.extra.forEach(r=>{
+      if(r.link===linkId)delete r.link;
+     });
+    }
+   });
+   rebuildPrices();
+   renderBase();updateDerived();save();
+  };
+ });
+}
+
+function renderBase(){
+ $("b-polymerBottlePrice").value=+S.base.polymerBottlePrice;
+ $("b-polymerBottleVolume").value=+S.base.polymerBottleVolume;
+ $("b-polymerMlPerCm3").value=+S.base.polymerMlPerCm3;
+ $("b-nsSheetPrice").value=+S.base.nsSheetPrice;
+ $("b-nsSheetWidth").value=+S.base.nsSheetWidth;
+ $("b-nsSheetLength").value=+S.base.nsSheetLength;
+ renderWoodList();
+ renderAmberList();
+ const list=$("b-ohItems");list.innerHTML="";
+ S.base.ohItems.forEach((it,i)=>{
+  const div=document.createElement("div");div.className="row";
+  div.innerHTML=`<span class="nm">${esc(it.n)}</span><input class="wide" type="number" step="1" value="${+it.v}" data-oh="${i}"><span class="u">₽/мес</span><button class="del" data-deloh="${i}" title="Удалить">×</button>`;
+  list.appendChild(div);
+ });
+ list.querySelectorAll("input[data-oh]").forEach(inp=>{
+  inp.oninput=()=>{
+   const i=+inp.dataset.oh;const v=parseFloat(inp.value.replace(",","."))||0;
+   S.base.ohItems[i].v=v;
+   renderBaseTotals();updateDerived();save();
+  };
+ });
+ list.querySelectorAll("[data-deloh]").forEach(b=>{
+  b.onclick=()=>{
+   S.base.ohItems.splice(+b.dataset.deloh,1);
+   renderBase();updateDerived();save();
+  };
+ });
+ $("b-hours").value=+S.base.hoursPerMonth;
+ renderCustomList();
+ renderBaseTotals();
+}
+
+function renderCustomList(){
+ const list=$("b-customList");list.innerHTML="";
+ S.base.materials.forEach((m,i)=>{
+  const div=document.createElement("div");div.className="row";
+  div.innerHTML=`<span class="nm">${esc(m.n)}</span><span class="u">${esc(m.u)}</span><input class="wide" type="number" step="0.01" value="${+m.p}" data-cm="${i}"><span class="u">₽/${esc(m.u)}</span><button class="del" data-delcm="${i}" title="Удалить">×</button>`;
+  list.appendChild(div);
+ });
+ list.querySelectorAll("input[data-cm]").forEach(inp=>{
+  inp.oninput=()=>{
+   const i=+inp.dataset.cm;const v=parseFloat(inp.value.replace(",","."))||0;
+   S.base.materials[i].p=v;
+   updateDerived();save();
+  };
+ });
+ list.querySelectorAll("[data-delcm]").forEach(b=>{
+  b.onclick=()=>{
+   const i=+b.dataset.delcm;
+   if(!confirm("Удалить материал «"+S.base.materials[i].n+"»?"))return;
+   S.base.materials.splice(i,1);
+   Object.values(S.e).forEach(e=>{
+    if(e.links){
+     Object.keys(e.links).forEach(k=>{
+      if(e.links[k]==="custom:"+i)delete e.links[k];
+      else if(e.links[k]&&e.links[k].indexOf("custom:")===0){
+       const idx=+e.links[k].slice(7);
+       if(idx>i)e.links[k]="custom:"+(idx-1);
+      }
+     });
+    }
+    if(Array.isArray(e.extra)){
+     e.extra.forEach(r=>{
+      if(r.link==="custom:"+i)delete r.link;
+      else if(r.link&&r.link.indexOf("custom:")===0){
+       const idx=+r.link.slice(7);
+       if(idx>i)r.link="custom:"+(idx-1);
+      }
+     });
+    }
+   });
+   renderBase();updateDerived();save();
+  };
+ });
+}
+
+function renderBaseTotals(){
+ $("b-polymerPricePerLiter").textContent=rub(getPolymerPricePerLiter())+" / л";
+ $("b-polymerPerCm3").textContent=rub(getPolymerPerCm3())+" / см³";
+ const area=getNsSheetArea();
+ $("b-nsSheetArea").textContent=(area>0?area.toLocaleString("ru-RU"):"0")+" см²";
+ $("b-nsPerCm2").textContent=rub(getNs())+" / см²";
+ $("b-ohTotal").textContent=rub(getOhTotal())+" / мес";
+ $("b-rate").textContent=rub(getOhRate())+" / час";
+}
+
+function updateDerived(){
+ rebuildPrices();
+ if(S.tab==="calc"){renderRows();calc();}
+}
+
+["b-polymerBottlePrice","b-polymerBottleVolume","b-polymerMlPerCm3","b-nsSheetPrice","b-nsSheetWidth","b-nsSheetLength","b-hours"].forEach(id=>{
+  const key=id.replace("b-","");
+  $(id).oninput=()=>{
+   const v=parseFloat($(id).value.replace(",","."));
+   if(isNaN(v))return;
+   S.base[key]=v;
+   if(key==="polymerBottlePrice"||key==="polymerBottleVolume"||key==="polymerMlPerCm3"){renderWoodList();}
+   renderBaseTotals();updateDerived();save();
+  };
+});
+
+$("b-addWood").onclick=()=>{
+ const n=(prompt("Название породы:","Например: Дуб красный")||"").trim();if(!n)return;
+ const raw=parseFloat((prompt("Стоимость сырья, ₽/см³ (без стабилизации):","0")||"0").replace(",","."))||0;
+ const id="uw"+Date.now();
+ S.base.woods.push({id:id,name:n,raw:raw});
+ renderWoodList();renderBaseTotals();updateDerived();save();
+};
+
+$("b-addAmber").onclick=()=>{
+ const n=(prompt("Название сорта янтаря:","Например: Янтарь прессованный")||"").trim();if(!n)return;
+ const kg=parseFloat((prompt("Цена, ₽/кг:","0")||"0").replace(",","."))||0;
+ const id="ua"+Date.now();
+ S.base.ambers.push({id:id,name:n,kg:kg});
+ renderAmberList();renderBaseTotals();updateDerived();save();
+};
+
+$("b-addOh").onclick=()=>{
+ const n=(prompt("Название статьи расходов:","Новая статья")||"").trim();if(!n)return;
+ const v=parseFloat((prompt("Сумма в месяц, ₽:","0")||"0").replace(",","."))||0;
+ S.base.ohItems.push({n:n,v:v});
+ renderBase();updateDerived();save();
+};
+
+$("b-addCustom").onclick=async()=>{
+ const n=(prompt("Название материала:")||"").trim();if(!n)return;
+ const u=await askWithSelect("Выберите единицу измерения:", UNIT_OPTIONS, "шт.");
+ if(!u)return;
+ const p=parseFloat((prompt("Цена за единицу, ₽:","0")||"0").replace(",","."))||0;
+ S.base.materials.push({n:n,u:u,p:p});
+ renderCustomList();updateDerived();save();
+};
+
+$("b-reset").onclick=()=>{
+ if(!confirm("Сбросить базовые цены, материалы и накладные расходы к исходным значениям?"))return;
+ S.base=JSON.parse(JSON.stringify(DEF_BASE));
+ rebuildPrices();
+ renderBase();updateDerived();save();
+};
+
+function switchTab(name){
+ S.tab=name;save();
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===name));
+ $("tab-calc").style.display=name==="calc"?"":"none";
+ $("tab-base").style.display=name==="base"?"":"none";
+ if(name==="base")renderBase();
+ else {renderRows();calc();}
+}
+document.querySelectorAll(".tab").forEach(t=>{
+ t.onclick=()=>switchTab(t.dataset.tab);
+});
+
+build();
+switchTab(S.tab||"calc");
+syncLoadSettings();
+if(SYNC.enabled){
+  setTimeout(()=>{ syncPull(true); },500);
+}
+</script>
+</body></html>
